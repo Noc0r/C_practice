@@ -1,22 +1,26 @@
 #include "list.h"
 #include <stdlib.h>
 
+
+static void link(list *list);
+
 list *create_list(void *data)
 {
     list *new_elem = (list *)malloc(sizeof(list));
     new_elem->data = data;
     new_elem->next = NULL;
+    link(new_elem);
     return new_elem;
 }
 
-void insert_element(list *position, void *element)
+static void insert_element(list *position, void *element)
 {
     list *elem = create_list(element);
     elem->next = position->next;
-    position->next = elem->next;
+    position->next = elem;
 }
 
-list *remove_element(list *head, void *element, int (*compare)(void *, void *))
+static list *remove_element(list *head, void *element, int (*compare)(void *, void *))
 {
     if(!compare(head->data,element))
     {
@@ -37,10 +41,17 @@ list *remove_element(list *head, void *element, int (*compare)(void *, void *))
     return head;
 }
 
-list *find_value(list *head, void *find_data, int (*compare)(void *, void *))
+static list *find_value(list *head, void *find_data, int (*compare)(void *, void *))
 {
     for (list *iter = head; iter; iter = iter->next)
         if (!compare(iter->data, find_data))
             return iter;
     return NULL;
+}
+
+static void link(list *list)
+{
+    list->insert_element = insert_element;
+    list->remove_element = remove_element;
+    list->find_value = find_value;
 }
