@@ -20,13 +20,8 @@ typedef struct node
     #endif
 } node;
 
-typedef struct list
-{
-    node *first;
-    node *last;
-    int size;
-    bool is_cyclic;
-} list;
+typedef struct list list;
+
 
 /**
     * Remove last element from the list

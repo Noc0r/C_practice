@@ -1,6 +1,15 @@
 #include "list.h"
 #include <stdlib.h>
 
+typedef struct list
+{
+    node *first;
+    node *last;
+    int size;
+    bool is_cyclic;
+} list;
+
+
 list *create_list(bool is_cyclic)
 {
     list *new_list = (list *)(malloc(sizeof(list)));
