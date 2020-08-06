@@ -1,6 +1,7 @@
 #include "list.h"
 #include <stdlib.h>
 
+typedef struct list_library list_lib;
 typedef struct list
 {
     node *first;
@@ -9,7 +10,20 @@ typedef struct list
     bool is_cyclic;
 } list;
 
-list *create_list(bool is_cyclic)
+static list *create_list(bool is_cyclic);
+static unsigned int count(list *list);
+static void *get_by_index(list *list, unsigned int index);
+static void set_by_index(list *list, unsigned int index, void *new_data);
+static void pop_back(list *list);
+static void pop_front(list *list);
+static void clear(list *list);
+static void push_back(list *list, void *data);
+static void push_front(list *list, void *data);
+static void insert_element(list *list, unsigned int pos, void *data);
+static bool remove_element(list *list, void *element, int (*compare)(void *, void *));
+static node *find_value(list *list, void *data, int (*compare)(void *, void *));
+
+static list *create_list(bool is_cyclic)
 {
     list *new_list = (list *)(malloc(sizeof(list)));
     new_list->first = NULL;
@@ -45,7 +59,7 @@ static void insert(node *pos, node *elem)
 #endif
 }
 
-void insert_element(list *this, unsigned int pos, void *element)
+static void insert_element(list *this, unsigned int pos, void *element)
 {
     if (pos == 0)
         push_front(this, element);
@@ -64,7 +78,7 @@ void insert_element(list *this, unsigned int pos, void *element)
     }
 }
 
-bool remove_element(list *this, void *element, int (*compare)(void *, void *))
+static bool remove_element(list *this, void *element, int (*compare)(void *, void *))
 {
     if (!compare(this->first->data, element))
     {
@@ -93,7 +107,7 @@ bool remove_element(list *this, void *element, int (*compare)(void *, void *))
     return false;
 }
 
-node *find_value(list *this, void *find_data, int (*compare)(void *, void *))
+static node *find_value(list *this, void *find_data, int (*compare)(void *, void *))
 {
     for (node *iter = this->first;; iter = iter->next)
     {
@@ -105,7 +119,7 @@ node *find_value(list *this, void *find_data, int (*compare)(void *, void *))
     return NULL;
 }
 
-void pop_back(list *this)
+static void pop_back(list *this)
 {
     if (this->size)
     {
@@ -139,7 +153,7 @@ void pop_back(list *this)
     }
 }
 
-void pop_front(list *this)
+static void pop_front(list *this)
 {
     if (this->size)
     {
@@ -162,13 +176,13 @@ void pop_front(list *this)
     }
 }
 
-void clear(list *this)
+static void clear(list *this)
 {
     while (this->size)
         pop_front(this);
 }
 
-void push_back(list *this, void *element)
+static void push_back(list *this, void *element)
 {
     node *elem = create_node(element);
     if (this->size)
@@ -189,7 +203,7 @@ void push_back(list *this, void *element)
     this->size++;
 }
 
-void push_front(list *this, void *element)
+static void push_front(list *this, void *element)
 {
     node *elem = create_node(element);
     if (this->size)
@@ -212,12 +226,12 @@ void push_front(list *this, void *element)
     this->size++;
 }
 
-unsigned int count(list *list)
+static unsigned int count(list *list)
 {
     return list->size;
 }
 
-void *get_by_index(list *list, unsigned int index)
+static void *get_by_index(list *list, unsigned int index)
 {
     if (index < list->size)
     {
@@ -229,7 +243,7 @@ void *get_by_index(list *list, unsigned int index)
     return NULL;
 }
 
-void set_by_index(list* list, unsigned int index, void* new_data)
+static void set_by_index(list *list, unsigned int index, void *new_data)
 {
     if (index < list->size)
     {
@@ -238,4 +252,22 @@ void set_by_index(list* list, unsigned int index, void* new_data)
             tmp = tmp->next;
         tmp->data = new_data;
     }
+}
+
+list_lib *create_list_library()
+{
+    list_lib *library = (list_lib *)malloc(sizeof(list_lib));
+    library->clear = clear;
+    library->count = count;
+    library->create_list = create_list;
+    library->find_value = find_value;
+    library->get_by_index = get_by_index;
+    library->insert_element = insert_element;
+    library->pop_back = pop_back;
+    library->pop_front = pop_front;
+    library->push_back = push_back;
+    library->push_front = push_front;
+    library->remove_element = remove_element;
+    library->set_by_index = set_by_index;
+    return library;
 }

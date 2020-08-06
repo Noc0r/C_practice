@@ -15,20 +15,34 @@ typedef struct vector
     unsigned int size;
 } vector;
 
-bool need_resize(unsigned int current_size, unsigned int max_size)
+static unsigned int count(vector *vect);
+static void *get_by_index(vector *vect, unsigned int index);
+static void set_by_index(vector *vect, unsigned int index, void *new_data);
+static void resize(vector *vect, unsigned int new_size);
+static void pop_back(vector *vect);
+static void clear(vector *vect);
+static void push_back(vector *vect, void *data);
+static void insert_element(vector *vect, unsigned int pos, void *data);
+static bool remove_element(vector *vect, void *element, int (*compare)(void *, void *));
+static bool remove_index(vector *vect, unsigned int pos);
+static vector *create_vector(unsigned int max_size);
+static bool need_resize(unsigned int current_size, unsigned int max_size);
+static void update(vector *vect);
+
+static bool need_resize(unsigned int current_size, unsigned int max_size)
 {
     if (max_size * RESIZE_OPTIMAL_CONSTANT < current_size)
         return true;
     return false;
 }
 
-void update(vector *vect)
+static void update(vector *vect)
 {
     if (need_resize(vect->size, vect->max_size))
         resize(vect, vect->max_size * RESIZE_SIZE_MULTIPLY);
 }
 
-vector *create_vector(unsigned int max_size)
+static vector *create_vector(unsigned int max_size)
 {
     vector *new_vect = (vector *)malloc(sizeof(vector));
     new_vect->max_size = max_size;
@@ -37,25 +51,25 @@ vector *create_vector(unsigned int max_size)
     return new_vect;
 }
 
-unsigned int count(vector *vect)
+static unsigned int count(vector *vect)
 {
     return vect->size;
 }
 
-void *get_by_index(vector *vect, unsigned int index)
+static void *get_by_index(vector *vect, unsigned int index)
 {
     if (index < vect->size)
         return (vect->array[index]).data;
     return NULL;
 }
 
-void set_by_index(vector *vect, unsigned int index, void *new_data)
+static void set_by_index(vector *vect, unsigned int index, void *new_data)
 {
     if (index < vect->size)
         (vect->array[index]).data = new_data;
 }
 
-void resize(vector *vect, unsigned int new_size)
+static void resize(vector *vect, unsigned int new_size)
 {
     if (!need_resize(vect->size, new_size))
     {
@@ -64,12 +78,12 @@ void resize(vector *vect, unsigned int new_size)
     }
 }
 
-void pop_back(vector *vect)
+static void pop_back(vector *vect)
 {
     vect->size--;
 }
 
-void clear(vector *vect)
+static void clear(vector *vect)
 {
     while (vect->size)
     {
@@ -77,14 +91,14 @@ void clear(vector *vect)
     }
 }
 
-void push_back(vector *vect, void *data)
+static void push_back(vector *vect, void *data)
 {
     vect->array[vect->size].data = data;
     vect->size++;
     update(vect);
 }
 
-void insert_element(vector *vect, unsigned int pos, void *data)
+static void insert_element(vector *vect, unsigned int pos, void *data)
 {
     if (pos >= vect->size)
         push_back(vect, data);
@@ -97,7 +111,7 @@ void insert_element(vector *vect, unsigned int pos, void *data)
     }
 }
 
-bool remove_element(vector *vect, void *element, int (*compare)(void *, void *))
+static bool remove_element(vector *vect, void *element, int (*compare)(void *, void *))
 {
     unsigned int pos = 0;
     while (compare(vect->array[pos].data, element) && pos < vect->size)
@@ -107,7 +121,7 @@ bool remove_element(vector *vect, void *element, int (*compare)(void *, void *))
     return remove_index(vect, pos);
 }
 
-bool remove_index(vector *vect, unsigned int pos)
+static bool remove_index(vector *vect, unsigned int pos)
 {
     if (pos < vect->size)
     {
@@ -125,4 +139,21 @@ bool remove_index(vector *vect, unsigned int pos)
     }
     vect->size--;
     return false;
+}
+
+vector_lib *create_vector_library()
+{
+    vector_lib *library = (vector_lib *)malloc(sizeof(vector_lib));
+    library->clear = clear;
+    library->count = count;
+    library->create_vector = create_vector;
+    library->get_by_index = get_by_index;
+    library->insert_element = insert_element;
+    library->pop_back = pop_back;
+    library->push_back = push_back;
+    library->remove_element = remove_element;
+    library->remove_index = remove_index;
+    library->resize = resize;
+    library->set_by_index = set_by_index;
+    return library;
 }
