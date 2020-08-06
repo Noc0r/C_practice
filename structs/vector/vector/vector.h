@@ -7,11 +7,17 @@
  * Resizable dynamic array
  * @author Senatrev Ruslan
  * @param array              pointer to the data array
- * @param size               amount of elements
- * @param element_size       size of each element       
+ * @param size               amount of elements  
 */
 
 typedef struct vector vector;
+
+/**
+    * Get size of current @param vect
+    * @param vect           pointer to the vector
+    * @return               NULL, if index out of range, else pointer to the element
+    */
+unsigned int count(vector *vect);
 
 /**
     * Get element of the array at @param index position
@@ -19,14 +25,22 @@ typedef struct vector vector;
     * @param index          element index in the array
     * @return               NULL, if index out of range, else pointer to the element
     */
-void* get_by_index(vector* vect, unsigned int index);
+void *get_by_index(vector *vect, unsigned int index);
+
+/**
+    * Set element of the array at @param index position
+    * @param vect           pointer to the vector
+    * @param index          element index in the array
+    * @return               
+    */
+void set_by_index(vector *vect, unsigned int index, void *new_data);
 
 /**
     * Change maximum size of array
     * @param new_size       new max_size for array
     * @return              
     */
-void resize(unsigned int new_size);
+void resize(vector *vect, unsigned int new_size);
 
 /**
     * Remove last element from the v
@@ -68,6 +82,13 @@ void insert_element(vector *vect, unsigned int pos, void *data);
     */
 bool remove_element(vector *vect, void *element, int (*compare)(void *, void *));
 
+/**
+    * Remove element from the vector
+    * @param vect          pointer to the vector
+    * @param pos           position in the vector
+    * @return              true, if element exist in the vector
+    */
+bool remove_index(vector *vect, unsigned int pos);
 
 /**
 * Create new vector, if current vector is empty
@@ -75,5 +96,5 @@ bool remove_element(vector *vect, void *element, int (*compare)(void *, void *))
 * @param max_size       maximum size of array
 * @return               pointer to the first element of vector
 */
-vector *create_vector(unsigned int element_size, unsigned int max_size);
+vector *create_vector(unsigned int max_size);
 #endif

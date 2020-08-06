@@ -22,6 +22,29 @@ typedef struct node
 
 typedef struct list list;
 
+/**
+    * Get size of current @param list
+    * @param list           pointer to the list
+    * @return               NULL, if index out of range, else pointer to the element
+    */
+unsigned int count(list* list);
+
+/**
+    * Get element of the array at @param index position
+    * @param list           pointer to the list
+    * @param index          element index in the array
+    * @return               NULL, if index out of range, else pointer to the element
+    */
+void *get_by_index(list* list, unsigned int index);
+
+/**
+    * Set element of the array at @param index position
+    * @param list           pointer to the list
+    * @param index          element index in the array
+    * @return               
+    */
+void set_by_index(list* list, unsigned int index, void* new_data);
+
 
 /**
     * Remove last element from the list

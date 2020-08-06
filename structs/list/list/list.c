@@ -9,7 +9,6 @@ typedef struct list
     bool is_cyclic;
 } list;
 
-
 list *create_list(bool is_cyclic)
 {
     list *new_list = (list *)(malloc(sizeof(list)));
@@ -211,4 +210,32 @@ void push_front(list *this, void *element)
 #endif
     }
     this->size++;
+}
+
+unsigned int count(list *list)
+{
+    return list->size;
+}
+
+void *get_by_index(list *list, unsigned int index)
+{
+    if (index < list->size)
+    {
+        node *tmp = list->first;
+        for (size_t i = 0; i < index; i++)
+            tmp = tmp->next;
+        return tmp->data;
+    }
+    return NULL;
+}
+
+void set_by_index(list* list, unsigned int index, void* new_data)
+{
+    if (index < list->size)
+    {
+        node *tmp = list->first;
+        for (size_t i = 0; i < index; i++)
+            tmp = tmp->next;
+        tmp->data = new_data;
+    }
 }
