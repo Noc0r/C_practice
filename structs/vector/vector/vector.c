@@ -25,6 +25,7 @@ static void push_back(vector *vect, void *data);
 static void insert_element(vector *vect, unsigned int pos, void *data);
 static bool remove_element(vector *vect, void *element, int (*compare)(void *, void *));
 static bool remove_index(vector *vect, unsigned int pos);
+static void swap(vector *vect, unsigned int first, unsigned int second);
 static vector *create_vector(unsigned int max_size);
 static bool need_resize(unsigned int current_size, unsigned int max_size);
 static void update(vector *vect);
@@ -141,6 +142,16 @@ static bool remove_index(vector *vect, unsigned int pos)
     return false;
 }
 
+static void swap(vector *vect, unsigned int first, unsigned int second)
+{
+    if (first < vect->size && second < vect->size)
+    {
+        void *tmp = vect->array[first].data;
+        vect->array[first].data = vect->array[second].data;
+        vect->array[second].data = tmp;
+    }
+}
+
 vector_lib *create_vector_library()
 {
     vector_lib *library = (vector_lib *)malloc(sizeof(vector_lib));
@@ -155,5 +166,6 @@ vector_lib *create_vector_library()
     library->remove_index = remove_index;
     library->resize = resize;
     library->set_by_index = set_by_index;
+    library->swap = swap;
     return library;
 }

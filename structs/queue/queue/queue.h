@@ -2,6 +2,12 @@
 #define QUEUE
 #include "../../list/list/list.h"
 
+/**
+ * Default queue implementation based on list
+ * @author Senatrev Ruslan
+ * @param queue          pointer to the list
+*/
+
 typedef struct queue queue;
 
 typedef struct queue_library
@@ -14,7 +20,7 @@ typedef struct queue_library
     void (*pop_front)(queue *obj);
 
     /**
-    * Remove all elements from the obj
+    * Remove all elements from the queue
     * @param obj       pointer to the queue
     * @return              
     */
@@ -38,7 +44,7 @@ typedef struct queue_library
     * Create new empty queue
     * @return              pointer to the new queue
     */
-    queue *(*create_obj)();
+    queue *(*create_queue)();
 } queue_lib;
 
 queue_lib *create_queue_library();

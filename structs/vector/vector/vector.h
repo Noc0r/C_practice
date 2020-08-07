@@ -94,6 +94,14 @@ typedef struct vector_library
     bool (*remove_index)(vector *vect, unsigned int pos);
 
     /**
+    * Remove element from the vector
+    * @param vect          pointer to the vector
+    * @param first         position of first element in the vector
+    * @param second        position of second element in the vector
+    * @return              true, if element exist in the vector
+    */
+    void (*swap)(vector *vect, unsigned int first, unsigned int second);
+    /**
 * Create new vector, if current vector is empty
 * @param element_size   size of each element
 * @param max_size       maximum size of array

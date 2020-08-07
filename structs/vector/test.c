@@ -11,27 +11,31 @@ int compare(void *a, void *b)
     return -1;
 }
 
-void print_vector(vector* test)
+void print_vector(vector *test)
 {
-    for (int i = 0; i < count(test); i++)
+    vector_lib *library = create_vector_library();
+    for (int i = 0; i < library->count(test); i++)
     {
-        printf("pos - %d, value - %d\n", i, *(int *)get_by_index(test, i));
+        printf("pos - %d, value - %d\n", i, *(int *)library->get_by_index(test, i));
     }
+    free(library);
 }
 
 int main()
 {
-    vector *test = create_vector(20);
+    vector_lib *library = create_vector_library();
+    vector *test = library->create_vector(20);
     for (int i = 0; i < 70; i++)
     {
         int *k = (int *)malloc(sizeof(int));
         *k = i;
-        push_back(test, k);
+        library->push_back(test, k);
     }
     print_vector(test);
     int rem_elem = 25;
-    remove_element(test, &rem_elem, compare);
-    remove_index(test, 40);
+    library->remove_element(test, &rem_elem, compare);
+    library->remove_index(test, 40);
     print_vector(test);
+    free(library);
     return 0;
 }
