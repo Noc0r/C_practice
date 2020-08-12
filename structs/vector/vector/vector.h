@@ -18,12 +18,12 @@ typedef struct vector_library
     /**
     * Get size of current @param vect
     * @param vect           pointer to the vector
-    * @return               NULL, if index out of range, else pointer to the element
+    * @return               amount of elements
     */
     unsigned int (*count)(vector *vect);
 
     /**
-    * Get element of the array at @param index position
+    * Get element of the array at chosen position
     * @param vect           pointer to the vector
     * @param index          element index in the array
     * @return               NULL, if index out of range, else pointer to the element
@@ -31,9 +31,10 @@ typedef struct vector_library
     void *(*get_by_index)(vector *vect, unsigned int index);
 
     /**
-    * Set element of the array at @param index position
+    * Set element of the array at chosen position
     * @param vect           pointer to the vector
     * @param index          element index in the array
+    * @param new_data       new data value for chosen element
     * @return               
     */
     void (*set_by_index)(vector *vect, unsigned int index, void *new_data);
@@ -46,7 +47,7 @@ typedef struct vector_library
     void (*resize)(vector *vect, unsigned int new_size);
 
     /**
-    * Remove last element from the v
+    * Remove last element from the vector
     * @param vect       pointer to the vector
     * @return              
     */
@@ -60,7 +61,7 @@ typedef struct vector_library
     void (*clear)(vector *vect);
 
     /**
-    * Insert new element to the end of the vector and make it last
+    * Insert new element to the end of the vector
     * @param vect          pointer to the vector
     * @param data          data of new element       
     * @return              

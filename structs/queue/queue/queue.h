@@ -1,6 +1,7 @@
 #ifndef QUEUE
 #define QUEUE
 #include "../../list/list/list.h"
+#include <stdlib.h>
 
 /**
  * Default queue implementation based on list

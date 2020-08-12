@@ -1,5 +1,4 @@
 #include "priority_queue.h"
-#include <stdlib.h>
 
 typedef struct prior_queue
 {
@@ -21,6 +20,8 @@ static int max_prior(void *first, void *second, int (*compare)(void *, void *));
 
 static unsigned int father(unsigned int pos)
 {
+    if (pos == 0)
+        return pos;
     if (pos % 2 == 0)
         pos--;
     return pos / 2;
@@ -53,7 +54,7 @@ static void up(prior_queue *obj, unsigned int pos)
 {
     vector_lib *library = create_vector_library();
     unsigned int root = father(pos);
-    while (obj->priority(library->get_by_index(obj->heap, pos), library->get_by_index(obj->heap, root)) >= 0)
+    while (pos && obj->priority(library->get_by_index(obj->heap, pos), library->get_by_index(obj->heap, root)) >= 0)
     {
         library->swap(obj->heap, pos, root);
         pos = root;
@@ -137,7 +138,7 @@ static prior_queue *create_prior_queue(int (*priority)(void *, void *))
     return new_heap;
 }
 
-prior_queue_lib *create_queue_library()
+prior_queue_lib *create_priorqueue_library()
 {
     prior_queue_lib *library = (prior_queue_lib *)malloc(sizeof(prior_queue_lib));
     library->clear = clear;

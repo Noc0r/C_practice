@@ -1,4 +1,3 @@
-#include <stdlib.h>
 #include "queue.h"
 
 typedef struct queue
@@ -36,8 +35,9 @@ static void push_back(queue *obj, void *data)
 static void *top(queue *obj)
 {
     list_lib *lib_list = create_list_library();
-    lib_list->get_by_index(obj->queue, 0);
+    void *result = lib_list->get_by_index(obj->queue, 0);
     free(lib_list);
+    return result;
 }
 
 static queue *create_queue()
@@ -46,6 +46,7 @@ static queue *create_queue()
     list_lib *lib_list = create_list_library();
     new_queue->queue = lib_list->create_list(false);
     free(lib_list);
+    return new_queue;
 }
 
 queue_lib *create_queue_library()
@@ -56,4 +57,5 @@ queue_lib *create_queue_library()
     library->pop_front = pop_front;
     library->push_back = push_back;
     library->top = top;
+    return library;
 }

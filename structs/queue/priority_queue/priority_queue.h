@@ -1,6 +1,7 @@
 #ifndef PRIOR_QUEUE
 #define PRIOR_QUEUE
 #include "../../vector/vector/vector.h"
+#include <stdlib.h>
 
 /**
  * Default binary heap realization based on vector
@@ -48,5 +49,5 @@ typedef struct prior_queue_library
     prior_queue *(*create_prior_queue)(int (*priority)(void *, void *));
 } prior_queue_lib;
 
-prior_queue_lib *create_queue_library();
+prior_queue_lib *create_priorqueue_library();
 #endif /* PRIOR_QUEUE */

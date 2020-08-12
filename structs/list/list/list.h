@@ -25,14 +25,14 @@ typedef struct list list;
 typedef struct list_library
 {
     /**
-    * Get size of current @param list
+    * Get size of current list
     * @param list           pointer to the list
-    * @return               NULL, if index out of range, else pointer to the element
+    * @return               amount of elements
     */
     unsigned int (*count)(list *list);
 
     /**
-    * Get element of the array at @param index position
+    * Get element of the array at chosen position
     * @param list           pointer to the list
     * @param index          element index in the array
     * @return               NULL, if index out of range, else pointer to the element
@@ -40,7 +40,7 @@ typedef struct list_library
     void *(*get_by_index)(list *list, unsigned int index);
 
     /**
-    * Set element of the array at @param index position
+    * Set element of the array at chosen position
     * @param list           pointer to the list
     * @param index          element index in the array
     * @return               
@@ -100,7 +100,7 @@ typedef struct list_library
     * @param compare       pointer to the compare function      
     * @return              true, if element exist in the list
     */
-    bool (*remove_element)(list *list, void *element, int (*compare)(void *, void *));
+    bool (*remove_element)(list *list, void *data, int (*compare)(void *, void *));
 
     /**
     * Find element in the list
