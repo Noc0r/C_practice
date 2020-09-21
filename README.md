@@ -1,16 +1,8 @@
-# C_practice
-<style
-  type="text/css">
-h1 {color:red;}
+You can use the diff language tag to generate some colored text:
 
-p {color:blue;}
-</style>
-okay
-
-<style
-  type="text/css">
-h1 {color:red;}
-
-p {color:blue;}
-</style>
-<p>okay</p>
+```diff
+- text in red
++ text in green
+! text in orange
+# text in gray
+@@ text in purple (and bold)@@
