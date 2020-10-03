@@ -35,9 +35,3 @@ void OFB_decr(data_t* blocks, uint32_t blocks_size, const data_t * key, function
 
 void CTR_encr(data_t* blocks, uint32_t blocks_size, const data_t * key, function encrypt);
 void CTR_decr(data_t* blocks, uint32_t blocks_size, const data_t * key, function decrypt);
-
-void RD_encr(data_t* blocks, uint32_t blocks_size, const data_t * key, function encrypt);
-void RD_decr(data_t* blocks, uint32_t blocks_size, const data_t * key, function decrypt);
-
-void GCM_encr(data_t* blocks, uint32_t blocks_size, const data_t * key, function encrypt);
-void GCM_decr(data_t* blocks, uint32_t blocks_size, const data_t * key, function decrypt);
