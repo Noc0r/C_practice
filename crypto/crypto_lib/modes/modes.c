@@ -33,27 +33,31 @@ void CBC_decr(data_t *blocks, uint32_t blocks_size, const data_t *key, function 
 
 void PCBC_encr(data_t *blocks, uint32_t blocks_size, const data_t *key, function encrypt)
 {
-    data_t *tmp = (data_t *)malloc(blocks_size * sizeof(data_t));
-    memcpy(tmp, blocks, blocks_size * sizeof(data_t));
-    memset(tmp->data, 0, tmp->size);
+    data_t tmp = blocks[0];
+    data_t tmp1;
+    memset(tmp.data, 0, tmp.size);
     for (size_t i = 1; i < blocks_size; i++)
     {
+        tmp1 = blocks[i];
         xor_modify(&blocks[i], &blocks[i - 1]);
-        xor_modify(&blocks[i], &tmp[i - 1]);
+        xor_modify(&blocks[i], &tmp);
         encrypt(&blocks[i], key);
+        tmp = tmp1;
     }
 }
 
 void PCBC_decr(data_t *blocks, uint32_t blocks_size, const data_t *key, function decrypt)
 {
-    data_t *tmp = (data_t *)malloc(blocks_size * sizeof(data_t));
-    memcpy(tmp, blocks, blocks_size * sizeof(data_t));
-    memset(tmp->data, 0, tmp->size);
+    data_t tmp = blocks[0];
+    data_t tmp1;
+    memset(tmp.data, 0, tmp.size);
     for (size_t i = 1; i < blocks_size; i++)
     {
+        tmp1 = blocks[i];
         decrypt(&blocks[i], key);
         xor_modify(&blocks[i], &blocks[i - 1]);
-        xor_modify(&blocks[i], &tmp[i - 1]);
+        xor_modify(&blocks[i], &tmp);
+        tmp = tmp1;
     }
 }
 
@@ -71,12 +75,11 @@ void CFB_encr(data_t *blocks, uint32_t blocks_size, const data_t *key, function 
 
 void CFB_decr(data_t *blocks, uint32_t blocks_size, const data_t *key, function decrypt)
 {
-    data_t *tmp = (data_t *)malloc(blocks_size * sizeof(data_t));
-    memcpy(tmp, blocks, blocks_size * sizeof(data_t));
+    data_t tmp = blocks[0];
     for (size_t i = 1; i < blocks_size; i++)
     {
-        decrypt(&tmp[i - 1], key);
-        xor_modify(&blocks[i], &tmp[i - 1]);
+        decrypt(&tmp, key);
+        xor_modify(&blocks[i], &tmp);
     }
 }
 

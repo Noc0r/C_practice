@@ -1,3 +1,5 @@
+#include "aes.h"
+
 char Sbox[] = {
     0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
     0xca, 0x82, 0xc9, 0x7d, 0xfa, 0x59, 0x47, 0xf0, 0xad, 0xd4, 0xa2, 0xaf, 0x9c, 0xa4, 0x72, 0xc0,
@@ -33,3 +35,99 @@ char InvSbox[] = {
     0x60, 0x51, 0x7f, 0xa9, 0x19, 0xb5, 0x4a, 0x0d, 0x2d, 0xe5, 0x7a, 0x9f, 0x93, 0xc9, 0x9c, 0xef,
     0xa0, 0xe0, 0x3b, 0x4d, 0xae, 0x2a, 0xf5, 0xb0, 0xc8, 0xeb, 0xbb, 0x3c, 0x83, 0x53, 0x99, 0x61,
     0x17, 0x2b, 0x04, 0x7e, 0xba, 0x77, 0xd6, 0x26, 0xe1, 0x69, 0x14, 0x63, 0x55, 0x21, 0x0c, 0x7d};
+
+char Rcon[8] = {0x01, 0x02, 0x04, 0x08, 0x10, 0x20, 0x40, 0x80};
+
+void compute_values(uint8_t *Nr, uint8_t *Nk, uint32_t size)
+{
+    switch (size)
+    {
+    case 16:
+        *Nr = 10;
+        *Nk = 4;
+        break;
+    case 24:
+        *Nr = 12;
+        *Nk = 6;
+        break;
+    case 32:
+        *Nr = 16;
+        *Nk = 8;
+        break;
+    default:
+        *Nr = 0;
+        *Nk = 0;
+    }
+}
+
+void encrypt(data_t *text, const data_t *key)
+{
+    uint8_t Nr, Nk, Nb = 4;
+    compute_values(&Nr, &Nk, key->size);
+}
+
+void decrypt(data_t *text, const data_t *key)
+{
+    uint8_t Nr, Nk, Nb = 4;
+    compute_values(&Nr, &Nk, key->size);
+}
+
+void subword(uint8_t *word)
+{
+    word[0] = Sbox[word[0]];
+    word[1] = Sbox[word[1]];
+    word[2] = Sbox[word[2]];
+    word[3] = Sbox[word[3]];
+}
+
+void rotword(uint8_t *word, uint8_t amount)
+{
+    switch (amount)
+    {
+    case 1:
+        uint8_t tmp = word[0];
+        word[0] = word[1];
+        word[1] = word[2];
+        word[2] = word[3];
+        word[3] = tmp;
+        break;
+    case 2:
+        uint8_t tmp = word[0];
+        word[0] = word[2];
+        word[2] = tmp;
+        tmp = word[1];
+        word[1] = word[3];
+        word[3] = tmp;
+        break;
+    case 3:
+
+        uint8_t tmp = word[3];
+        word[3] = word[2];
+        word[2] = word[1];
+        word[1] = word[0];
+        word[0] = tmp;
+        break;
+    default:
+        break;
+    }
+}
+
+data_t *key_expansion(const data_t *key, uint8_t Nb, uint8_t Nk, uint8_t Nr)
+{
+    data_t *r_key = (data_t *)malloc(sizeof(data_t));
+    r_key->size = Nb * (Nr + 1);
+    uint8_t *r_key_data = (uint8_t *)malloc(r_key->size * sizeof(uint32_t));
+    r_key->data = r_key_data;
+    memcpy(r_key->data, key->data, key->size);
+    uint16_t i = Nk;
+    while (i < r_key->size)
+    {
+        uint32_t temp = ((uint32_t *)r_key->data)[i - 1];
+        if (i % Nk == 0)
+            temp = subword(rotword(temp)) ^ Rcon[i / Nk];
+        else if (Nk > 6 && i % Nk == 4)
+            temp = SubWord(temp);
+        ((uint32_t *)r_key->data)[i] = ((uint32_t *)r_key->data)[i - Nk] ^ temp;
+        i = i + 1
+    }
+}
