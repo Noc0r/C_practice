@@ -10,6 +10,16 @@ typedef struct data
     uint32_t size;
 } data_t;
 
+void destroy_data(data_t *obj)
+{
+    if (obj)
+    {
+        if (obj->data)
+            free(obj->data);
+        free(obj);
+    }
+}
+
 data_t *split_data(const data_t *s_data, uint32_t block_size)
 {
     uint32_t padding = (block_size - s_data->size % block_size);
@@ -19,7 +29,7 @@ data_t *split_data(const data_t *s_data, uint32_t block_size)
     //need add/del padding function
     memset(result + s_data->size, 0, padding);
     uint32_t block_count = (res_size / block_size);
-    data_t *blocks = (data_t *)malloc(block_count * sizeof(data));
+    data_t *blocks = (data_t *)malloc(block_count * sizeof(data_t));
     for (size_t i = 0; i < block_count; i++)
     {
         blocks[i].data = result + block_size * i;

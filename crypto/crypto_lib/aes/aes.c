@@ -1,4 +1,5 @@
 #include "aes.h"
+#include <stdbool.h>
 
 char Sbox[] = {
     0x63, 0x7c, 0x77, 0x7b, 0xf2, 0x6b, 0x6f, 0xc5, 0x30, 0x01, 0x67, 0x2b, 0xfe, 0xd7, 0xab, 0x76,
@@ -60,16 +61,22 @@ void compute_values(uint8_t *Nr, uint8_t *Nk, uint32_t size)
     }
 }
 
-void encrypt(data_t *text, const data_t *key)
+uint8_t galua_mul(uint8_t a, uint8_t b)
 {
-    uint8_t Nr, Nk, Nb = 4;
-    compute_values(&Nr, &Nk, key->size);
-}
-
-void decrypt(data_t *text, const data_t *key)
-{
-    uint8_t Nr, Nk, Nb = 4;
-    compute_values(&Nr, &Nk, key->size);
+    uint8_t p = 0;
+    for (size_t i = 0; i < 8; i++)
+    {
+        if ((b & 1) != 0)
+            p ^= a;
+        bool hi_bit_set = (a & 0x80);
+        a <<= 1;
+        if (hi_bit_set)
+        {
+            a ^= 0x1B; /* x^8 + x^4 + x^3 + x + 1 */
+        }
+        b >>= 1;
+    }
+    return p;
 }
 
 void subword(uint8_t *word)
@@ -78,6 +85,14 @@ void subword(uint8_t *word)
     word[1] = Sbox[word[1]];
     word[2] = Sbox[word[2]];
     word[3] = Sbox[word[3]];
+}
+
+void inv_subword(uint8_t *word)
+{
+    word[0] = InvSbox[word[0]];
+    word[1] = InvSbox[word[1]];
+    word[2] = InvSbox[word[2]];
+    word[3] = InvSbox[word[3]];
 }
 
 void rotword(uint8_t *word, uint8_t amount)
@@ -100,7 +115,6 @@ void rotword(uint8_t *word, uint8_t amount)
         word[3] = tmp;
         break;
     case 3:
-
         uint8_t tmp = word[3];
         word[3] = word[2];
         word[2] = word[1];
@@ -124,10 +138,118 @@ data_t *key_expansion(const data_t *key, uint8_t Nb, uint8_t Nk, uint8_t Nr)
     {
         uint32_t temp = ((uint32_t *)r_key->data)[i - 1];
         if (i % Nk == 0)
-            temp = subword(rotword(temp)) ^ Rcon[i / Nk];
+        {
+            rotword(temp, 1);
+            subword(temp);
+            temp ^= Rcon[i / Nk];
+        }
         else if (Nk > 6 && i % Nk == 4)
-            temp = SubWord(temp);
+            subword(temp);
         ((uint32_t *)r_key->data)[i] = ((uint32_t *)r_key->data)[i - Nk] ^ temp;
-        i = i + 1
+        i++;
     }
+}
+
+void add_round_key(data_t *state, uint8_t *round_words)
+{
+    for (size_t i = 0; i < state->size; i++)
+        state->data[i] ^= round_words[i];
+}
+
+void subbytes(data_t *state)
+{
+    subword(&state->data[0]);
+    subword(&state->data[4]);
+    subword(&state->data[8]);
+    subword(&state->data[12]);
+}
+
+void shift_rows(data_t *state)
+{
+    rotword(&state->data[4], 1);
+    rotword(&state->data[8], 2);
+    rotword(&state->data[12], 3);
+}
+
+void mix_columns(data_t *state)
+{
+    uint8_t *tmp = (uint8_t *)malloc(state->size * sizeof(uint8_t));
+    memcpy(tmp, state->data, state->size);
+    for (size_t i = 0; i < 4; i++)
+    {
+        state->data[i] = galua_mul(0x02, tmp[i]) ^ galua_mul(0x03, tmp[4 + i]) ^ tmp[8 + i] ^ tmp[12 + i];
+        state->data[4 + i] = galua_mul(0x02, tmp[4 + i]) ^ galua_mul(0x03, tmp[8 + i]) ^ tmp[12 + i] ^ tmp[i];
+        state->data[8 + i] = galua_mul(0x02, tmp[8 + i]) ^ galua_mul(0x03, tmp[12 + i]) ^ tmp[i] ^ tmp[4 + i];
+        state->data[12 + i] = galua_mul(0x02, tmp[12 + i]) ^ galua_mul(0x03, tmp[i]) ^ tmp[4 + i] ^ tmp[8 + i];
+    }
+    free(tmp);
+}
+
+void inv_subbytes(data_t *state)
+{
+    inv_subword(&state->data[0]);
+    inv_subword(&state->data[4]);
+    inv_subword(&state->data[8]);
+    inv_subword(&state->data[12]);
+}
+
+void inv_shift_rows(data_t *state)
+{
+    rotword(&state->data[4], 3);
+    rotword(&state->data[8], 2);
+    rotword(&state->data[12], 1);
+}
+
+void inv_mix_columns(data_t *state)
+{
+    uint8_t *tmp = (uint8_t *)malloc(state->size * sizeof(uint8_t));
+    memcpy(tmp, state->data, state->size);
+    for (size_t i = 0; i < 4; i++)
+    {
+        state->data[i] = galua_mul(0x0E, tmp[i]) ^ galua_mul(0x0B, tmp[4 + i]) ^ galua_mul(0x0D, tmp[8 + i]) ^ galua_mul(0x09, tmp[12 + i]);
+        state->data[4 + i] = galua_mul(0x0E, tmp[4 + i]) ^ galua_mul(0x0B, tmp[8 + i]) ^ galua_mul(0x0D, tmp[12 + i]) ^ galua_mul(0x09, tmp[i]);
+        state->data[8 + i] = galua_mul(0x0E, tmp[8 + i]) ^ galua_mul(0x0B, tmp[12 + i]) ^ galua_mul(0x0D, tmp[i]) ^ galua_mul(0x09, tmp[4 + i]);
+        state->data[12 + i] = galua_mul(0x0E, tmp[12 + i]) ^ galua_mul(0x0B, tmp[i]) ^ galua_mul(0x0D, tmp[4 + i]) ^ galua_mul(0x09, tmp[8 + i]);
+    }
+    free(tmp);
+}
+
+void encrypt(data_t *text, const data_t *key)
+{
+    uint8_t Nr, Nk, Nb = 4;
+    const uint8_t word_size = 4;
+    compute_values(&Nr, &Nk, key->size);
+    data_t *round_key = key_expansion(key, Nb, Nk, Nr);
+    add_round_key(text, round_key->data);
+    for (size_t round = 1; round < Nr; round++)
+    {
+        subbytes(text);
+        shift_rows(text);
+        mix_columns(text);
+        add_round_key(text, &round_key->data[word_size * round * Nb]);
+    }
+    subbytes(text);
+    shift_rows(text);
+    add_round_key(text, &round_key->data[word_size * Nr * Nb]);
+    destroy_data(round_key);
+}
+
+void decrypt(data_t *text, const data_t *key)
+{
+    uint8_t Nr, Nk, Nb = 4;
+    const uint8_t word_size = 4;
+    compute_values(&Nr, &Nk, key->size);
+    data_t *round_key = key_expansion(key, Nb, Nk, Nr);
+    add_round_key(text, &round_key->data[word_size * Nr * Nb]);
+    for (size_t round = Nr - 1; round >= 1; round--)
+    {
+        inv_subbytes(text);
+        inv_shift_rows(text);
+        add_round_key(text, &round_key->data[word_size * round * Nb]);
+        inv_mix_columns(text);
+    }
+    inv_subbytes(text);
+    inv_shift_rows(text);
+    add_round_key(text, round_key->data);
+    destroy_data(round_key);
 }
