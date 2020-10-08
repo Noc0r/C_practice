@@ -27,14 +27,14 @@ data_t *key_expansion(const data_t *key)
     uint8_t *r_key_data = (uint8_t *)malloc(r_key->size * sizeof(uint32_t));
 }
 
-void aes_encrypt(data_t *text, const data_t *key)
+void serpent_encrypt(data_t *text, const data_t *key)
 {
     const uint8_t word_size = 4;
     data_t *round_key = key_expansion(key);
     destroy_data(round_key);
 }
 
-void aes_decrypt(data_t *text, const data_t *key)
+void serpent_decrypt(data_t *text, const data_t *key)
 {
     const uint8_t word_size = 4;
     data_t *round_key = key_expansion(key);
