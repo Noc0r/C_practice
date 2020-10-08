@@ -214,7 +214,7 @@ void inv_mix_columns(data_t *state)
     free(tmp);
 }
 
-void encrypt(data_t *text, const data_t *key)
+void aes_encrypt(data_t *text, const data_t *key)
 {
     uint8_t Nr, Nk, Nb = 4;
     const uint8_t word_size = 4;
@@ -234,7 +234,7 @@ void encrypt(data_t *text, const data_t *key)
     destroy_data(round_key);
 }
 
-void decrypt(data_t *text, const data_t *key)
+void aes_decrypt(data_t *text, const data_t *key)
 {
     uint8_t Nr, Nk, Nb = 4;
     const uint8_t word_size = 4;
