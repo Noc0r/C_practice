@@ -7,12 +7,15 @@
 #include <string.h> 
 #include <sys/socket.h> 
 #include <sys/types.h> 
+#include <arpa/inet.h>
+#include <unistd.h>
 #include <stdbool.h>
 #define MAX 80 
 #define PORT 8080 
 #define SA struct sockaddr 
 
 typedef struct server_interface server;
+typedef struct server_private server_private;
 
 typedef enum server_errors
 {
@@ -26,16 +29,18 @@ typedef enum server_errors
 
 struct server_interface
 {
-    bool (*create_socket)(server_interface* interface);
-    bool (*bind_port)(server_interface* interface, SA* server);
-    SA* (*listen)(server_interface* interface);
-    int (*send)(server_interface* interface);
-    int (*read)(server_interface* interface);
-    int (*get_socket)(server_interface* interface);
-    void (*set_socket)(server_interface* interface, int sock);
-    server_errors (*get_last_error)(server_interface* interface);
+    bool (*create_socket)(server_private* interface);
+    bool (*bind_port)(server_private* interface, struct sockaddr_in * server);
+    struct sockaddr_in* (*listen_socket)(server_private* interface);
+    int (*send_data)(server_private* interface, char* msg, int msg_len);
+    int (*read_data)(server_private* interface, char* msg, int msg_len);
+    int (*get_socket)(server_private* interface);
+    void (*set_socket)(server_private* interface, int sock);
+    server_errors (*get_last_error)(server_private* interface);
 };
 
-server_interface* create_server();
+server_private* create_server();
+server* get_public(server_private* this);
+void destroy_server(server_private* this);
 
 #endif // SERVER
